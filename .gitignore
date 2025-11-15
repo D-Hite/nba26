@@ -60,3 +60,6 @@ desktop.ini
 # Keep important scripts or mapping files if needed
 data/
 
+*.env
+info.txt
+rsa*

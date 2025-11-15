@@ -8,5 +8,6 @@ dependencies = [
     "duckdb>=1.4.2",
     "nba-api>=1.11.3",
     "pandas>=2.3.3",
+    "snowflake-connector-python>=4.0.0",
     "sqlmesh>=0.227.1",
 ]
