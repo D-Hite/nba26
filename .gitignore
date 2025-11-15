@@ -1,0 +1,62 @@
+# ---------------------------
+# Build / output
+# ---------------------------
+/build/
+/bin/
+/obj/
+/dist/
+/Library/
+/Temp/
+/Logs/
+/Saved/
+/Intermediate/
+
+# ---------------------------
+# OS / Editor
+# ---------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# VSCode / IDEs
+.vscode/
+.idea/
+*.suo
+*.user
+*.userprefs
+*.csproj
+*.pidb
+*.booproj
+*.unityproj
+
+# ---------------------------
+# Cache / generated
+# ---------------------------
+*.cache
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+
+# ---------------------------
+# Packages / dependencies
+# ---------------------------
+/Packages/
+/*.dll
+/*.exe
+/*.pdb
+/*.mdb
+
+# ---------------------------
+# Optional: ignore CSV / data outputs
+# ---------------------------
+*.csv
+*.tsv
+*.json
+*.parquet
+*.xlsx
+
+# Keep important scripts or mapping files if needed
+data/
+
