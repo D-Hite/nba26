@@ -1,10 +1,11 @@
 import os
 import time
 import random
-import pandas as pd
+import argparse
 from datetime import datetime
-from dotenv import load_dotenv, find_dotenv
 
+import pandas as pd
+from dotenv import load_dotenv, find_dotenv
 from requests.exceptions import Timeout
 from urllib3.exceptions import ReadTimeoutError
 import nba_api.stats.endpoints as ep
@@ -42,8 +43,8 @@ def get_snowflake_conn():
     return connect(
         account="RPOSWFZ-OIB57673",
         user="grunk",
-        password=os.getenv("PAT"),
-        warehouse="compute_wh",
+        password=os.getenv("PAT"),  # or SNOWFLAKE_PASSWORD if you switch
+        warehouse="BACKEND_WH",
         database="NBA",
         schema="RAW",
     )
@@ -60,14 +61,14 @@ def upsert_to_snowflake(df, endpoint, is_team, conn):
 
     if is_team:
         target_table = f"TEAMS_{endpoint.upper()}"
-        stage_table  = f"TEAMS_{endpoint.upper()}_STAGE"
+        stage_table = f"TEAMS_{endpoint.upper()}_STAGE"
         if endpoint.lower() == "traditional":
             key_cols = ["GAMEID", "TEAMID", "STARTERSBENCH"]
         else:
             key_cols = ["GAMEID", "TEAMID"]
     else:
         target_table = f"PLAYERS_{endpoint.upper()}"
-        stage_table  = f"PLAYERS_{endpoint.upper()}_STAGE"
+        stage_table = f"PLAYERS_{endpoint.upper()}_STAGE"
         key_cols = ["GAMEID", "TEAMID", "PERSONID"]
 
     col_defs = ", ".join([f"{col} STRING" for col in df.columns])
@@ -76,14 +77,14 @@ def upsert_to_snowflake(df, endpoint, is_team, conn):
     """
     with conn.cursor() as cur:
         cur.execute(create_stage_sql)
-    
+
     try:
         write_pandas(
             conn,
             df,
             table_name=stage_table,
             schema="STAGE",
-            database="NBA"
+            database="NBA",
         )
     except Exception as e:
         logger.error(f"problem uploading data for {target_table}, {e}")
@@ -112,10 +113,12 @@ def upsert_to_snowflake(df, endpoint, is_team, conn):
 # ============================================================
 
 def _local_file_paths(endpoint, season):
-    team_path = os.path.join(BASE_PATH, "data", "raw", "teams", endpoint,
-                             f"teams_{endpoint}{season}.csv")
-    players_path = os.path.join(BASE_PATH, "data", "raw", "players", endpoint,
-                                f"players_{endpoint}{season}.csv")
+    team_path = os.path.join(
+        BASE_PATH, "data", "raw", "teams", endpoint, f"teams_{endpoint}{season}.csv"
+    )
+    players_path = os.path.join(
+        BASE_PATH, "data", "raw", "players", endpoint, f"players_{endpoint}{season}.csv"
+    )
     return team_path, players_path
 
 
@@ -158,10 +161,8 @@ def upload_missing_local(endpoint, season, conn):
     team_missing = team_df[team_df["gameId"].isin(missing)]
     player_missing = player_df[player_df["gameId"].isin(missing)]
 
-    write_pandas(conn, team_missing.rename(columns=str.upper),
-                 f"TEAMS_{endpoint.upper()}")
-    write_pandas(conn, player_missing.rename(columns=str.upper),
-                 f"PLAYERS_{endpoint.upper()}")
+    write_pandas(conn, team_missing.rename(columns=str.upper), f"TEAMS_{endpoint.upper()}")
+    write_pandas(conn, player_missing.rename(columns=str.upper), f"PLAYERS_{endpoint.upper()}")
 
 
 def write_data(endpoint, season, tstats, pstats, snowflake=False, overwrite=False, conn=None):
@@ -213,29 +214,46 @@ def get_nba_season(date=None):
 
 
 def fetch_log():
-    """Fetch the season log of NBA games or fallback to local cached log."""
+    """
+    Fetch the full season log of NBA games or fallback to local cached log.
+    On success, ALWAYS overwrite local log file with the entire season log.
+    """
     season = get_nba_season()
     gidset = set()
+
+    log_dir = os.path.join(BASE_PATH, "data", "raw", "log")
+    log_file = os.path.join(log_dir, f"log{season}.csv")
+
     try:
         result = ep.leaguegamefinder.LeagueGameFinder(season_nullable=season)
         all_games = result.get_data_frames()[0]
 
-        rs = all_games[(all_games.SEASON_ID == "2" + season[:4]) &
-                       (all_games.GAME_ID.str.startswith("002"))]
-
-        ps = all_games[(all_games.SEASON_ID == "4" + season[:4]) &
-                       (all_games.GAME_ID.str.startswith("004"))]
-
-        cup = all_games[(all_games.SEASON_ID == "6" + season[:4]) &
-                        (all_games.GAME_ID.str.startswith("006"))]
+        rs = all_games[
+            (all_games.SEASON_ID == "2" + season[:4])
+            & (all_games.GAME_ID.str.startswith("002"))
+        ]
+        ps = all_games[
+            (all_games.SEASON_ID == "4" + season[:4])
+            & (all_games.GAME_ID.str.startswith("004"))
+        ]
+        cup = all_games[
+            (all_games.SEASON_ID == "6" + season[:4])
+            & (all_games.GAME_ID.str.startswith("006"))
+        ]
 
         log = pd.concat([rs, ps, cup])
         gidset = {gid.zfill(10) for gid in log["GAME_ID"]}
 
+        # Refresh local cache on success
+        os.makedirs(log_dir, exist_ok=True)
+        log.to_csv(log_file, index=False)
+        logger.info(f"Wrote full log for {season} to {log_file} ({len(log)} games).")
+
     except Exception as e:
         logger.error(f"Failed live fetch; loading cached log {season}: {e}")
-        path = os.path.join(BASE_PATH, "data", "raw", "log", f"log{season}.csv")
-        log = pd.read_csv(path, dtype={"GAME_ID": str})
+        if not os.path.exists(log_file):
+            raise  # nothing to fall back to
+        log = pd.read_csv(log_file, dtype={"GAME_ID": str})
         gidset = {gid.zfill(10) for gid in log["GAME_ID"]}
 
     return log, gidset
@@ -299,7 +317,6 @@ def get_gid_list(conn):
 
     # --- Fetch missing games for each endpoint ---
     for endpoint in ENDPOINTS:
-
         with conn.cursor() as cur:
             cur.execute(
                 f"""
@@ -342,54 +359,21 @@ def get_gid_list(conn):
                 players,
                 snowflake=True,
                 overwrite=False,
-                conn=conn
+                conn=conn,
             )
 
 
 # ============================================================
 #                     RESCRAPE SINGLE GAME
 # ============================================================
-def update_log_for_game(gid, conn):
-    """
-    Update the log for a single game (local CSV + Snowflake LOG_TABLE)
-    """
-    season = get_nba_season()
-    log_file = os.path.join(BASE_PATH, "data", "raw", "log", f"log{season}.csv")
 
-    # --- Fetch fresh log ---
-    log, _ = fetch_log()
-    game_log = log[log["GAME_ID"] == gid]
-    if game_log.empty:
-        logger.warning(f"No log info found for game {gid}. Skipping log update.")
-        return
-
-    # --- Update local log CSV ---
-    if os.path.exists(log_file):
-        local_log = pd.read_csv(log_file, dtype={"GAME_ID": str})
-        local_log = local_log[local_log["GAME_ID"] != gid]  # remove old row
-        combined_log = pd.concat([local_log, game_log], ignore_index=True)
-    else:
-        os.makedirs(os.path.dirname(log_file), exist_ok=True)
-        combined_log = game_log
-
-    combined_log.to_csv(log_file, index=False)
-    logger.info(f"Updated local log CSV for game {gid}")
-
-    # --- Update Snowflake LOG_TABLE ---
-    try:
-        with conn.cursor() as cur:
-            cur.execute(f"DELETE FROM RAW.LOG_TABLE WHERE GAME_ID = '{gid}'")
-        write_pandas(conn, game_log, "LOG_TABLE")
-        logger.info(f"Updated Snowflake LOG_TABLE for game {gid}")
-    except Exception as e:
-        logger.error(f"Failed updating LOG_TABLE in Snowflake for game {gid}: {e}")
 def rescrape_single_game(gid, conn):
     """
     Re-scrape one game ID for ALL endpoints and update:
         - local CSVs (teams & players)
-        - Snowflake tables (teams & players)
-        - local log CSV
-        - Snowflake LOG_TABLE
+        - Snowflake RAW tables (teams & players)
+        - Snowflake LOG_TABLE row for that game
+        - local log CSV stays full-season via fetch_log()
     """
     season = get_nba_season()
     logger.info(f"--- Re-scraping game {gid} for season {season} ---")
@@ -408,7 +392,6 @@ def rescrape_single_game(gid, conn):
             logger.warning(f"No data returned for endpoint {endpoint_name}, game {gid}. Skipping.")
             continue
 
-        # Write both local CSVs + Snowflake MERGE (overwrite=True ensures update)
         try:
             write_data(
                 endpoint_name,
@@ -416,27 +399,52 @@ def rescrape_single_game(gid, conn):
                 teams,
                 players,
                 snowflake=True,
-                overwrite=True
+                overwrite=True,
+                conn=conn,
             )
             logger.info(f"Updated game {gid} for endpoint {endpoint_name}")
         except Exception as e:
             logger.error(f"Error writing data for {endpoint_name}, game {gid}: {e}")
 
-    # --- Update log table (local + Snowflake) ---
+    # --- Refresh log row for this game in Snowflake (and local log file) ---
     try:
-        update_log_for_game(gid, conn)
+        full_log, _ = fetch_log()  # overwrites local log file
+        game_log = full_log[full_log["GAME_ID"] == gid]
+        if game_log.empty:
+            logger.warning(f"No log info found for game {gid}. Skipping LOG_TABLE update.")
+        else:
+            with conn.cursor() as cur:
+                cur.execute("DELETE FROM RAW.LOG_TABLE WHERE GAME_ID = %s", (gid,))
+            write_pandas(conn, game_log, "LOG_TABLE")
+            logger.info(f"Updated Snowflake LOG_TABLE for game {gid}")
     except Exception as e:
-        logger.error(f"Failed updating log for game {gid}: {e}")
+        logger.error(f"Failed updating LOG_TABLE/log file for game {gid}: {e}")
 
     logger.info(f"--- Finished re-scraping game {gid} ---")
 
+
 # ============================================================
-#                          MAIN
+#                          MAIN / CLI
 # ============================================================
 
-if __name__ == "__main__":
+def main():
+    parser = argparse.ArgumentParser(description="NBA ingestion + rescrape utility")
+    parser.add_argument(
+        "--rescrape",
+        metavar="GAME_ID",
+        help="Rescrape a single game ID (e.g., 0022500059). If omitted, runs full daily ingestion.",
+    )
+    args = parser.parse_args()
+
     conn = get_snowflake_conn()
-    # get_gid_list(conn)
-    gid = '0022500059'
-    rescrape_single_game(gid, conn)
-    conn.close()
+    try:
+        if args.rescrape:
+            rescrape_single_game(args.rescrape, conn)
+        else:
+            get_gid_list(conn)
+    finally:
+        conn.close()
+
+
+if __name__ == "__main__":
+    main()

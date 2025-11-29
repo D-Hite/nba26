@@ -1,6 +1,6 @@
-# ---------------------------
+# ===========================
 # Build / output
-# ---------------------------
+# ===========================
 /build/
 /bin/
 /obj/
@@ -11,14 +11,14 @@
 /Saved/
 /Intermediate/
 
-# ---------------------------
+# ===========================
 # OS / Editor
-# ---------------------------
+# ===========================
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# VSCode / IDEs
+# IDEs
 .vscode/
 .idea/
 *.suo
@@ -26,12 +26,38 @@ desktop.ini
 *.userprefs
 *.csproj
 *.pidb
-*.booproj
-*.unityproj
 
-# ---------------------------
-# Cache / generated
-# ---------------------------
+# ===========================
+# Python / venv
+# ===========================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.venv/
+venv/
+.uv/
+
+# pip / uv build cache
+pip-log.txt
+pip-wheel-metadata/
+
+# Poetry / pipenv
+.poetry/
+Pipfile.lock
+poetry.lock
+
+# ===========================
+# SQLMesh
+# ===========================
+.sqlmesh/
+.sqlmesh_tmp/
+.sqlmesh_dev/
+
+# ===========================
+# Cache / temp
+# ===========================
 *.cache
 *.log
 *.tmp
@@ -39,27 +65,53 @@ desktop.ini
 *.swp
 *.swo
 
-# ---------------------------
-# Packages / dependencies
-# ---------------------------
+# ===========================
+# Packages / binaries
+# ===========================
 /Packages/
 /*.dll
 /*.exe
 /*.pdb
 /*.mdb
 
-# ---------------------------
-# Optional: ignore CSV / data outputs
-# ---------------------------
+# ===========================
+# Data outputs (raw or generated)
+# ===========================
 *.csv
 *.tsv
 *.json
 *.parquet
 *.xlsx
 
-# Keep important scripts or mapping files if needed
-data/
+# Local data folders
+data/raw/
+data/temp/
+data/cache/
+logs/
+temp/
 
+# BUT keep your SQLMesh models folder:
+!sqlmesh/
+!sqlmesh/models/
+
+# ===========================
+# Project-specific sensitive files
+# ===========================
+*config.yaml
 *.env
+.envrc
 info.txt
 rsa*
+id_rsa*
+id_ed25519*
+*.pem
+*.p8
+
+# ===========================
+# Node (if anything uses it)
+# ===========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
