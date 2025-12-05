@@ -10,6 +10,7 @@ SELECT
   gameId,
   gameDate,
   firstName,
+  familyName,
   personId,
   playedFlag,
   isLastGame,

@@ -52,10 +52,11 @@ ranked_games AS (
         -- Row number for most recent *played* game
         ROW_NUMBER() OVER (
             PARTITION BY personId, seasonId
-            ORDER BY CASE WHEN playedFlag = 1 THEN gameDate ELSE NULL END DESC
+            ORDER BY playedFlag DESC, gameDate DESC
         ) AS rnPlayed
     FROM player_games
 )
+
 
 SELECT
     -- base player metadata from players_combined

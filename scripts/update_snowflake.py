@@ -423,6 +423,22 @@ def rescrape_single_game(gid, conn):
     logger.info(f"--- Finished re-scraping game {gid} ---")
 
 
+def rescrape_full(conn):
+    # --- Check log games that look incomplete --
+    with conn.cursor() as cur:
+        cur.execute("SELECT DISTINCT GAME_ID FROM UTILS.CURRENT_SEASON_LOG_LOW_MINUTES")
+        incomplete_games = {r[0] for r in cur.fetchall()}
+    
+    logger.info(f"ATTEMPTING TO COLLECT {len(incomplete_games['GAME_ID'])} INCOMPLETE GAMES")
+
+    ## possibly add more if more bad data is found maybe in raw files
+    for gid in incomplete_games['GAME_ID']:
+        rescrape_single_game(gid, conn)
+
+
+
+    
+
 # ============================================================
 #                          MAIN / CLI
 # ============================================================
@@ -434,12 +450,18 @@ def main():
         metavar="GAME_ID",
         help="Rescrape a single game ID (e.g., 0022500059). If omitted, runs full daily ingestion.",
     )
+    parser.add_argument(
+        "--full",
+        help="Rescrape games from alert queries. If omitted, runs full daily ingestion.",
+    )
     args = parser.parse_args()
 
     conn = get_snowflake_conn()
     try:
         if args.rescrape:
             rescrape_single_game(args.rescrape, conn)
+        if args.full:
+            rescrape_full(conn)
         else:
             get_gid_list(conn)
     finally:

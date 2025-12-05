@@ -1,0 +1,5 @@
+model ideas
+player data
+all z scores leading up to the game - just do total z
+team score is players that ARE PLAYING z scores added up
+maybe add a minute weight on z score sum
