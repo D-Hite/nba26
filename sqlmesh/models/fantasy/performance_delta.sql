@@ -38,7 +38,7 @@ avg AS (
         average_blocks,
         average_total_rebounds,
         average_three_pointers_made
-    FROM fantasy.base_stats_averages
+    FROM fantasy.averages
 ),
 
 joined AS (

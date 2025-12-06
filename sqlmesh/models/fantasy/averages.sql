@@ -1,5 +1,5 @@
 MODEL (
-  name fantasy.base_stats_averages,
+  name fantasy.averages,
   kind INCREMENTAL_BY_TIME_RANGE (
     time_column gameDate
   ),

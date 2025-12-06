@@ -26,15 +26,8 @@ WITH cumulative AS (
         average_effective_field_goal_percentage AS avgEfgPct,
         average_free_throw_percentage  AS avgFtPct
 
-    FROM fantasy.base_stats_averages
+    FROM fantasy.averages_current
 ),
-
-seasonTotals AS (
-    SELECT *
-    FROM cumulative
-    WHERE isLastGame = 1
-),
-
 zScores AS (
     SELECT
         seasonId,
@@ -73,7 +66,7 @@ zScores AS (
         (avgFtPct - AVG(avgFtPct) OVER (PARTITION BY seasonId))
             / STDDEV(avgFtPct) OVER (PARTITION BY seasonId) AS ftPctZScore
 
-    FROM seasonTotals
+    FROM cumulative
 )
 
 SELECT
