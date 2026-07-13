@@ -2,183 +2,152 @@ MODEL (
   name base.players_combined,
   kind INCREMENTAL_BY_TIME_RANGE (
     time_column gameDate
-  )
+  ),
+  dialect duckdb
 );
 
-SELECT DISTINCT
-    -- 1. Metadata (log_table → camelCase)
-    raw.log_table.SEASON_ID AS seasonId,
-    raw.log_table.TEAM_ID AS teamId,
-    raw.log_table.TEAM_ABBREVIATION AS teamAbbreviation,
-    raw.log_table.TEAM_NAME AS teamName,
-    CAST(raw.log_table.GAME_ID AS VARCHAR) AS gameId,
-    raw.log_table.GAME_DATE AS gameDate,
-    raw.log_table.MATCHUP AS matchup,
-    raw.log_table.WL AS winLoss,
+WITH joined AS (
+  SELECT DISTINCT
+    -- 1) Metadata (typed)
+    TRY_CAST(lt.season_id AS BIGINT) AS seasonId,
+    TRY_CAST(lt.team_id AS BIGINT) AS teamId,
+    lt.team_abbreviation AS teamAbbreviation,
+    lt.team_name AS teamName,
+    CAST(lt.game_id AS VARCHAR) AS gameId,
+    TRY_CAST(lt.game_date AS DATE) AS gameDate,
+    lt.matchup AS matchup,
+    lt.wl AS winLoss,
 
-    -- 2. Player identity
-    COALESCE(
-        raw.players_fourfactors.personId,
-        raw.players_advanced.personId,
-        raw.players_misc.personId,
-        raw.players_scoring.personId,
-        raw.players_traditional.personId
+    -- 2) Player identity (ids typed, strings kept)
+    TRY_CAST(
+      COALESCE(
+        pf.personid,
+        pa.personid,
+        pm.personid,
+        ps.personid,
+        pt.personid
+      ) AS BIGINT
     ) AS personId,
 
-    COALESCE(
-        raw.players_fourfactors.firstName,
-        raw.players_advanced.firstName,
-        raw.players_misc.firstName,
-        raw.players_scoring.firstName,
-        raw.players_traditional.firstName
-    ) AS firstName,
+    COALESCE(pf.firstname, pa.firstname, pm.firstname, ps.firstname, pt.firstname) AS firstName,
+    COALESCE(pf.familyname, pa.familyname, pm.familyname, ps.familyname, pt.familyname) AS familyName,
+    COALESCE(pf.playerslug, pa.playerslug, pm.playerslug, ps.playerslug, pt.playerslug) AS playerSlug,
+    COALESCE(pf.position, pa.position, pm.position, ps.position, pt.position) AS position,
+    COALESCE(pf.comment, pa.comment, pm.comment, ps.comment, pt.comment) AS comment,
+    COALESCE(pf.teamcity, pa.teamcity, pm.teamcity, ps.teamcity, pt.teamcity) AS teamCity,
+
+    -- 3) Core box score stats (typed numeric)
+    COALESCE(pf.minutes, pa.minutes, pm.minutes, ps.minutes, pt.minutes) AS minutes,
+
+    TRY_CAST(pt.points AS DOUBLE) AS points,
+    TRY_CAST(pt.fieldgoalsmade AS DOUBLE) AS fieldGoalsMade,
+    TRY_CAST(pt.fieldgoalsattempted AS DOUBLE) AS fieldGoalsAttempted,
+    TRY_CAST(pt.fieldgoalspercentage AS DOUBLE) AS fieldGoalsPercentage,
+    TRY_CAST(pt.threepointersmade AS DOUBLE) AS threePointersMade,
+    TRY_CAST(pt.threepointersattempted AS DOUBLE) AS threePointersAttempted,
+    TRY_CAST(pt.threepointerspercentage AS DOUBLE) AS threePointersPercentage,
+    TRY_CAST(pt.freethrowsmade AS DOUBLE) AS freeThrowsMade,
+    TRY_CAST(pt.freethrowsattempted AS DOUBLE) AS freeThrowsAttempted,
+    TRY_CAST(pt.freethrowspercentage AS DOUBLE) AS freeThrowsPercentage,
+    TRY_CAST(pt.reboundsoffensive AS DOUBLE) AS reboundsOffensive,
+    TRY_CAST(pt.reboundsdefensive AS DOUBLE) AS reboundsDefensive,
+    TRY_CAST(pt.reboundstotal AS DOUBLE) AS reboundsTotal,
+    TRY_CAST(pt.assists AS DOUBLE) AS assists,
+    TRY_CAST(pt.steals AS DOUBLE) AS steals,
+
+    COALESCE(TRY_CAST(pm.blocks AS DOUBLE), TRY_CAST(pt.blocks AS DOUBLE)) AS blocks,
+    COALESCE(TRY_CAST(pm.foulspersonal AS DOUBLE), TRY_CAST(pt.foulspersonal AS DOUBLE)) AS foulsPersonal,
+
+    TRY_CAST(pt.turnovers AS DOUBLE) AS turnovers,
+    TRY_CAST(pt.plusminuspoints AS DOUBLE) AS plusMinusPoints,
+
+    -- 4) Advanced metrics (typed numeric)
+    TRY_CAST(pa.estimatedoffensiverating AS DOUBLE) AS estimatedOffensiveRating,
+    TRY_CAST(pa.offensiverating AS DOUBLE) AS offensiveRating,
+    TRY_CAST(pa.estimateddefensiverating AS DOUBLE) AS estimatedDefensiveRating,
+    TRY_CAST(pa.defensiverating AS DOUBLE) AS defensiveRating,
+    TRY_CAST(pa.estimatednetrating AS DOUBLE) AS estimatedNetRating,
+    TRY_CAST(pa.netrating AS DOUBLE) AS netRating,
+    TRY_CAST(pa.assistpercentage AS DOUBLE) AS assistPercentage,
+    TRY_CAST(pa.assisttoturnover AS DOUBLE) AS assistToTurnover,
+    TRY_CAST(pa.assistratio AS DOUBLE) AS assistRatio,
 
     COALESCE(
-        raw.players_fourfactors.familyName,
-        raw.players_advanced.familyName,
-        raw.players_misc.familyName,
-        raw.players_scoring.familyName,
-        raw.players_traditional.familyName
-    ) AS familyName,
+      TRY_CAST(pf.offensivereboundpercentage AS DOUBLE),
+      TRY_CAST(pa.offensivereboundpercentage AS DOUBLE)
+    ) AS offensiveReboundPercentage,
+
+    TRY_CAST(pa.defensivereboundpercentage AS DOUBLE) AS defensiveReboundPercentage,
+    TRY_CAST(pa.reboundpercentage AS DOUBLE) AS reboundPercentage,
+    TRY_CAST(pf.teamturnoverpercentage AS DOUBLE) AS teamTurnoverPercentage,
 
     COALESCE(
-        raw.players_fourfactors.playerSlug,
-        raw.players_advanced.playerSlug,
-        raw.players_misc.playerSlug,
-        raw.players_scoring.playerSlug,
-        raw.players_traditional.playerSlug
-    ) AS playerSlug,
+      TRY_CAST(pf.effectivefieldgoalpercentage AS DOUBLE),
+      TRY_CAST(pa.effectivefieldgoalpercentage AS DOUBLE)
+    ) AS effectiveFieldGoalPercentage,
 
-    COALESCE(
-        raw.players_fourfactors.position,
-        raw.players_advanced.position,
-        raw.players_misc.position,
-        raw.players_scoring.position,
-        raw.players_traditional.position
-    ) AS position,
+    TRY_CAST(pa.trueshootingpercentage AS DOUBLE) AS trueShootingPercentage,
+    TRY_CAST(pa.usagepercentage AS DOUBLE) AS usagePercentage,
+    TRY_CAST(pa.estimatedusagepercentage AS DOUBLE) AS estimatedUsagePercentage,
+    TRY_CAST(pa.estimatedpace AS DOUBLE) AS estimatedPace,
+    TRY_CAST(pa.pace AS DOUBLE) AS pace,
+    TRY_CAST(pa.paceper40 AS DOUBLE) AS pacePer40,
+    TRY_CAST(pa.possessions AS DOUBLE) AS possessions,
+    TRY_CAST(pa.pie AS DOUBLE) AS PIE,
 
-    COALESCE(
-        raw.players_fourfactors.comment,
-        raw.players_advanced.comment,
-        raw.players_misc.comment,
-        raw.players_scoring.comment,
-        raw.players_traditional.comment
-    ) AS comment,
+    -- 5) Misc / derived (typed numeric)
+    TRY_CAST(pf.freethrowattemptrate AS DOUBLE) AS freeThrowAttemptRate,
+    TRY_CAST(pf.oppeffectivefieldgoalpercentage AS DOUBLE) AS oppEffectiveFieldGoalPercentage,
+    TRY_CAST(pf.oppfreethrowattemptrate AS DOUBLE) AS oppFreeThrowAttemptRate,
+    TRY_CAST(pf.oppteamturnoverpercentage AS DOUBLE) AS oppTeamTurnoverPercentage,
+    TRY_CAST(pf.oppoffensivereboundpercentage AS DOUBLE) AS oppOffensiveReboundPercentage,
 
-    COALESCE(
-        raw.players_fourfactors.teamCity,
-        raw.players_advanced.teamCity,
-        raw.players_misc.teamCity,
-        raw.players_scoring.teamCity,
-        raw.players_traditional.teamCity
-    ) AS teamCity,
+    TRY_CAST(pm.pointsoffturnovers AS DOUBLE) AS pointsOffTurnovers,
+    TRY_CAST(pm.pointssecondchance AS DOUBLE) AS pointsSecondChance,
+    TRY_CAST(pm.pointsfastbreak AS DOUBLE) AS pointsFastBreak,
+    TRY_CAST(pm.pointspaint AS DOUBLE) AS pointsPaint,
+    TRY_CAST(pm.opppointsoffturnovers AS DOUBLE) AS oppPointsOffTurnovers,
+    TRY_CAST(pm.opppointssecondchance AS DOUBLE) AS oppPointsSecondChance,
+    TRY_CAST(pm.opppointsfastbreak AS DOUBLE) AS oppPointsFastBreak,
+    TRY_CAST(pm.opppointspaint AS DOUBLE) AS oppPointsPaint,
+    TRY_CAST(pm.blocksagainst AS DOUBLE) AS blocksAgainst,
+    TRY_CAST(pm.foulsdrawn AS DOUBLE) AS foulsDrawn,
 
-    -- 3. Core Box Score Stats (NO renaming)
-    COALESCE(
-        raw.players_fourfactors.minutes,
-        raw.players_advanced.minutes,
-        raw.players_misc.minutes,
-        raw.players_scoring.minutes,
-        raw.players_traditional.minutes
-    ) AS minutes,
+    -- 6) Scoring % breakdown (typed numeric)
+    TRY_CAST(ps.percentagefieldgoalsattempted2pt AS DOUBLE) AS percentageFieldGoalsAttempted2pt,
+    TRY_CAST(ps.percentagefieldgoalsattempted3pt AS DOUBLE) AS percentageFieldGoalsAttempted3pt,
+    TRY_CAST(ps.percentagepoints2pt AS DOUBLE) AS percentagePoints2pt,
+    TRY_CAST(ps.percentagepointsmidrange2pt AS DOUBLE) AS percentagePointsMidrange2pt,
+    TRY_CAST(ps.percentagepoints3pt AS DOUBLE) AS percentagePoints3pt,
+    TRY_CAST(ps.percentagepointsfastbreak AS DOUBLE) AS percentagePointsFastBreak,
+    TRY_CAST(ps.percentagepointsfreethrow AS DOUBLE) AS percentagePointsFreeThrow,
+    TRY_CAST(ps.percentagepointsoffturnovers AS DOUBLE) AS percentagePointsOffTurnovers,
+    TRY_CAST(ps.percentagepointspaint AS DOUBLE) AS percentagePointsPaint,
+    TRY_CAST(ps.percentageassisted2pt AS DOUBLE) AS percentageAssisted2pt,
+    TRY_CAST(ps.percentageunassisted2pt AS DOUBLE) AS percentageUnassisted2pt,
+    TRY_CAST(ps.percentageassisted3pt AS DOUBLE) AS percentageAssisted3pt,
+    TRY_CAST(ps.percentageunassisted3pt AS DOUBLE) AS percentageUnassisted3pt,
+    TRY_CAST(ps.percentageassistedfgm AS DOUBLE) AS percentageAssistedFGM,
+    TRY_CAST(ps.percentageunassistedfgm AS DOUBLE) AS percentageUnassistedFGM
 
-    raw.players_traditional.points,
-    raw.players_traditional.fieldGoalsMade,
-    raw.players_traditional.fieldGoalsAttempted,
-    raw.players_traditional.fieldGoalsPercentage,
-    raw.players_traditional.threePointersMade,
-    raw.players_traditional.threePointersAttempted,
-    raw.players_traditional.threePointersPercentage,
-    raw.players_traditional.freeThrowsMade,
-    raw.players_traditional.freeThrowsAttempted,
-    raw.players_traditional.freeThrowsPercentage,
-    raw.players_traditional.reboundsOffensive,
-    raw.players_traditional.reboundsDefensive,
-    raw.players_traditional.reboundsTotal,
-    raw.players_traditional.assists,
-    raw.players_traditional.steals,
+  FROM raw.log_table lt
+  LEFT JOIN raw.players_traditional pt
+    ON TRY_CAST(lt.game_id AS BIGINT) = TRY_CAST(pt.gameid AS BIGINT)
+   AND lt.team_abbreviation = pt.teamtricode
+  LEFT JOIN raw.players_advanced pa
+    ON TRY_CAST(pt.gameid AS BIGINT) = TRY_CAST(pa.gameid AS BIGINT)
+   AND TRY_CAST(pt.personid AS BIGINT) = TRY_CAST(pa.personid AS BIGINT)
+  LEFT JOIN raw.players_fourfactors pf
+    ON TRY_CAST(pa.gameid AS BIGINT) = TRY_CAST(pf.gameid AS BIGINT)
+   AND TRY_CAST(pa.personid AS BIGINT) = TRY_CAST(pf.personid AS BIGINT)
+  LEFT JOIN raw.players_scoring ps
+    ON TRY_CAST(pf.gameid AS BIGINT) = TRY_CAST(ps.gameid AS BIGINT)
+   AND TRY_CAST(pf.personid AS BIGINT) = TRY_CAST(ps.personid AS BIGINT)
+  LEFT JOIN raw.players_misc pm
+    ON TRY_CAST(ps.gameid AS BIGINT) = TRY_CAST(pm.gameid AS BIGINT)
+   AND TRY_CAST(ps.personid AS BIGINT) = TRY_CAST(pm.personid AS BIGINT)
+)
 
-    COALESCE(raw.players_misc.blocks, raw.players_traditional.blocks) AS blocks,
-    COALESCE(raw.players_misc.foulsPersonal, raw.players_traditional.foulsPersonal) AS foulsPersonal,
-
-    raw.players_traditional.turnovers,
-    raw.players_traditional.plusMinusPoints,
-
-    -- 4. Advanced Metrics (NO renaming)
-    raw.players_advanced.estimatedOffensiveRating,
-    raw.players_advanced.offensiveRating,
-    raw.players_advanced.estimatedDefensiveRating,
-    raw.players_advanced.defensiveRating,
-    raw.players_advanced.estimatedNetRating,
-    raw.players_advanced.netRating,
-    raw.players_advanced.assistPercentage,
-    raw.players_advanced.assistToTurnover,
-    raw.players_advanced.assistRatio,
-
-    COALESCE(raw.players_fourfactors.offensiveReboundPercentage, raw.players_advanced.offensiveReboundPercentage) AS offensiveReboundPercentage,
-    raw.players_advanced.defensiveReboundPercentage,
-    raw.players_advanced.reboundPercentage,
-
-    raw.players_fourfactors.teamTurnoverPercentage,
-    COALESCE(raw.players_fourfactors.effectiveFieldGoalPercentage, raw.players_advanced.effectiveFieldGoalPercentage) AS effectiveFieldGoalPercentage,
-
-    raw.players_advanced.trueShootingPercentage,
-    raw.players_advanced.usagePercentage,
-    raw.players_advanced.estimatedUsagePercentage,
-    raw.players_advanced.estimatedPace,
-    raw.players_advanced.pace,
-    raw.players_advanced.pacePer40,
-    raw.players_advanced.possessions,
-    raw.players_advanced.PIE,
-
-    -- 5. Misc / Derived
-    raw.players_fourfactors.freeThrowAttemptRate,
-    raw.players_fourfactors.oppEffectiveFieldGoalPercentage,
-    raw.players_fourfactors.oppFreeThrowAttemptRate,
-    raw.players_fourfactors.oppTeamTurnoverPercentage,
-    raw.players_fourfactors.oppOffensiveReboundPercentage,
-
-    raw.players_misc.pointsOffTurnovers,
-    raw.players_misc.pointsSecondChance,
-    raw.players_misc.pointsFastBreak,
-    raw.players_misc.pointsPaint,
-    raw.players_misc.oppPointsOffTurnovers,
-    raw.players_misc.oppPointsSecondChance,
-    raw.players_misc.oppPointsFastBreak,
-    raw.players_misc.oppPointsPaint,
-    raw.players_misc.blocksAgainst,
-    raw.players_misc.foulsDrawn,
-
-    -- 6. Scoring Percentages
-    raw.players_scoring.percentageFieldGoalsAttempted2pt,
-    raw.players_scoring.percentageFieldGoalsAttempted3pt,
-    raw.players_scoring.percentagePoints2pt,
-    raw.players_scoring.percentagePointsMidrange2pt,
-    raw.players_scoring.percentagePoints3pt,
-    raw.players_scoring.percentagePointsFastBreak,
-    raw.players_scoring.percentagePointsFreeThrow,
-    raw.players_scoring.percentagePointsOffTurnovers,
-    raw.players_scoring.percentagePointsPaint,
-    raw.players_scoring.percentageAssisted2pt,
-    raw.players_scoring.percentageUnassisted2pt,
-    raw.players_scoring.percentageAssisted3pt,
-    raw.players_scoring.percentageUnassisted3pt,
-    raw.players_scoring.percentageAssistedFGM,
-    raw.players_scoring.percentageUnassistedFGM
-
-FROM raw.log_table
-LEFT JOIN raw.players_traditional
-    ON raw.log_table.GAME_ID::INT = raw.players_traditional.gameId::INT
-    AND raw.log_table.TEAM_ABBREVIATION = raw.players_traditional.teamTricode
-LEFT JOIN raw.players_advanced
-    ON raw.players_traditional.gameId::INT = raw.players_advanced.gameId::INT
-    AND raw.players_traditional.personId = raw.players_advanced.personId
-LEFT JOIN raw.players_fourfactors
-    ON raw.players_advanced.gameId::INT = raw.players_fourfactors.gameId::INT
-    AND raw.players_advanced.personId = raw.players_fourfactors.personId
-LEFT JOIN raw.players_scoring
-    ON raw.players_fourfactors.gameId::INT = raw.players_scoring.gameId::INT
-    AND raw.players_fourfactors.personId = raw.players_scoring.personId
-LEFT JOIN raw.players_misc
-    ON raw.players_scoring.gameId::INT = raw.players_misc.gameId::INT
-    AND raw.players_scoring.personId = raw.players_misc.personId;
+SELECT *
+FROM joined
+WHERE gameDate IS NOT NULL;

@@ -1,9 +1,10 @@
 MODEL (
   name raw.current_season,
   kind VIEW,
-  dialect snowflake
+  dialect duckdb
 );
-select
-max(season_id) as seasonId
-from nba.raw.log_table
-where season_id ilike '2%'
+
+SELECT
+  MAX(CAST(season_id AS INTEGER)) AS seasonId
+FROM raw.log_table
+WHERE season_id LIKE '2%';
