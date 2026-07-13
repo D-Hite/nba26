@@ -304,6 +304,17 @@ wheels = [
 ]
 
 [[package]]
+name = "espn-api"
+version = "0.43.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "requests" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/67/b3/96354fc6416c74d114866b975176a900c5c27478ac1c1de0cfc3b265d0ac/espn_api-0.43.0-py3-none-any.whl", hash = "sha256:f44dca0f4a4242b7c1449b01e80a90eb7c883cb3acf32c1ce4fe3fca3365b7ec", size = 66096, upload-time = "2024-11-08T15:53:21.916Z" },
+]
+
+[[package]]
 name = "executing"
 version = "2.2.1"
 source = { registry = "https://pypi.org/simple" }
@@ -645,6 +656,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "dotenv" },
     { name = "duckdb" },
+    { name = "espn-api" },
     { name = "nba-api" },
     { name = "pandas" },
     { name = "requests" },
@@ -657,6 +669,7 @@ dependencies = [
 requires-dist = [
     { name = "dotenv", specifier = ">=0.9.9" },
     { name = "duckdb", specifier = ">=1.4.2" },
+    { name = "espn-api", specifier = ">=0.43.0" },
     { name = "nba-api", specifier = ">=1.11.3" },
     { name = "pandas", specifier = ">=2.3.3" },
     { name = "requests", specifier = ">=2.32.5" },

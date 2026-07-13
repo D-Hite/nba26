@@ -1,0 +1,15 @@
+-- get latest data
+
+python -m scripts.ingest --ingest
+
+python -m scripts.ingest --rescrape "0022500059,0022500060"
+
+python -m scripts.ingest --rescrape-file games.txt
+
+
+-- get espn rosters
+python3 -m scripts.pull_espn_roster
+
+python3 -m scripts.ingest_espn_rosters_to_duckdb
+
+python3 -m scripts.espn_player_map

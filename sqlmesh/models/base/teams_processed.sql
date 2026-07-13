@@ -7,8 +7,8 @@ WITH base_data AS (
     SELECT
         *,
         CASE 
-            WHEN seasonId::VARCHAR ILIKE '4%' THEN 'PLAYOFFS'
-            WHEN seasonId::VARCHAR ILIKE '6%' THEN 'NBA_CUP'
+            WHEN CAST(seasonId AS VARCHAR) ILIKE '4%' THEN 'PLAYOFFS'
+            WHEN CAST(seasonId AS VARCHAR) ILIKE '6%' THEN 'NBA_CUP'
             ELSE 'REGULAR'
         END AS seasonType,
         COALESCE(plusMinus, 0) AS scoreDiff,
@@ -65,24 +65,18 @@ ranked_games AS (
         ) AS lastTeamGameDate,
 
         -- Days since last game
-        DATEDIFF(
-            'day',
-            CAST(LAG(gameDate) OVER (
+        date_diff('day', CAST(LAG(gameDate) OVER (
                 PARTITION BY teamId, seasonId
-                ORDER BY gameDate
-            ) AS DATE),
+                ORDER BY gameDate) AS DATE),
             CAST(gameDate AS DATE)
         ) AS daysSinceLastGame,
 
 
         -- Back-to-back flag
         CASE 
-            WHEN DATEDIFF(
-                'day',
-                CAST(LAG(gameDate) OVER (
+            WHEN date_diff('day', CAST(LAG(gameDate) OVER (
                     PARTITION BY teamId, seasonId
-                    ORDER BY gameDate
-                ) AS DATE),
+                    ORDER BY gameDate) AS DATE),
                 CAST(gameDate AS DATE)
             ) = 1 THEN 1 ELSE 0
         END AS isBackToBack,
@@ -147,7 +141,7 @@ record_agg AS (
         ) AS last10WinPercentage
     FROM ranked_games
 ),
--- THIS MAY NEED WORK:: TODO
+-- THIS MAY NEED CAST(WORK AS TODO)
 vs_opponent_record AS (
     SELECT
         r.teamId,
