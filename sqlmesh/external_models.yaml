@@ -1,333 +1,338 @@
-- name: raw.lines_table
+- name: '"NBA"."RAW"."LINES_TABLE"'
   columns:
-    date: BIGINT
-    team: VARCHAR
-    site: VARCHAR
-    o:team: VARCHAR
-    line: DOUBLE
-    total: DOUBLE
-  gateway: duckdb
-- name: raw.log_table
+    DATE: DECIMAL(38, 0)
+    TEAM: VARCHAR(16777216)
+    SITE: VARCHAR(16777216)
+    O_TEAM: VARCHAR(16777216)
+    LINE: DECIMAL(38, 1)
+    TOTAL: DECIMAL(38, 2)
+  gateway: snowflake
+- name: '"NBA"."RAW"."LINE_TEAM_MAPPING"'
   columns:
-    season_id: VARCHAR
-    team_id: VARCHAR
-    team_abbreviation: VARCHAR
-    team_name: VARCHAR
-    game_id: VARCHAR
-    game_date: VARCHAR
-    matchup: VARCHAR
-    wl: VARCHAR
-    min: VARCHAR
-    pts: VARCHAR
-    fgm: VARCHAR
-    fga: VARCHAR
-    fg_pct: VARCHAR
-    fg3m: VARCHAR
-    fg3a: VARCHAR
-    fg3_pct: VARCHAR
-    ftm: VARCHAR
-    fta: VARCHAR
-    ft_pct: VARCHAR
-    oreb: VARCHAR
-    dreb: VARCHAR
-    reb: VARCHAR
-    ast: VARCHAR
-    stl: VARCHAR
-    blk: VARCHAR
-    tov: VARCHAR
-    pf: VARCHAR
-    plus_minus: VARCHAR
-  gateway: duckdb
-- name: raw.players_advanced
+    C1: VARCHAR(16777216)
+    C2: VARCHAR(16777216)
+  gateway: snowflake
+- name: '"NBA"."RAW"."LOG_TABLE"'
   columns:
-    gameid: VARCHAR
-    teamid: VARCHAR
-    teamcity: VARCHAR
-    teamname: VARCHAR
-    teamtricode: VARCHAR
-    teamslug: VARCHAR
-    personid: VARCHAR
-    firstname: VARCHAR
-    familyname: VARCHAR
-    namei: VARCHAR
-    playerslug: VARCHAR
-    position: VARCHAR
-    comment: VARCHAR
-    jerseynum: VARCHAR
-    minutes: VARCHAR
-    estimatedoffensiverating: VARCHAR
-    offensiverating: VARCHAR
-    estimateddefensiverating: VARCHAR
-    defensiverating: VARCHAR
-    estimatednetrating: VARCHAR
-    netrating: VARCHAR
-    assistpercentage: VARCHAR
-    assisttoturnover: VARCHAR
-    assistratio: VARCHAR
-    offensivereboundpercentage: VARCHAR
-    defensivereboundpercentage: VARCHAR
-    reboundpercentage: VARCHAR
-    turnoverratio: VARCHAR
-    effectivefieldgoalpercentage: VARCHAR
-    trueshootingpercentage: VARCHAR
-    usagepercentage: VARCHAR
-    estimatedusagepercentage: VARCHAR
-    estimatedpace: VARCHAR
-    pace: VARCHAR
-    paceper40: VARCHAR
-    possessions: VARCHAR
-    pie: VARCHAR
-  gateway: duckdb
-- name: raw.players_fourfactors
+    SEASON_ID: DECIMAL(38, 0)
+    TEAM_ID: DECIMAL(38, 0)
+    TEAM_ABBREVIATION: VARCHAR(16777216)
+    TEAM_NAME: VARCHAR(16777216)
+    GAME_ID: VARCHAR(16777216)
+    GAME_DATE: DATE
+    MATCHUP: VARCHAR(16777216)
+    WL: VARCHAR(16777216)
+    MIN: DECIMAL(38, 0)
+    PTS: DECIMAL(38, 0)
+    FGM: DECIMAL(38, 0)
+    FGA: DECIMAL(38, 0)
+    FG_PCT: DECIMAL(38, 3)
+    FG3M: DECIMAL(38, 0)
+    FG3A: DECIMAL(38, 0)
+    FG3_PCT: DECIMAL(38, 3)
+    FTM: DECIMAL(38, 0)
+    FTA: DECIMAL(38, 0)
+    FT_PCT: DECIMAL(38, 3)
+    OREB: DECIMAL(38, 0)
+    DREB: DECIMAL(38, 0)
+    REB: DECIMAL(38, 0)
+    AST: DECIMAL(38, 0)
+    STL: DECIMAL(38, 0)
+    BLK: DECIMAL(38, 0)
+    TOV: DECIMAL(38, 0)
+    PF: DECIMAL(38, 0)
+    PLUS_MINUS: DECIMAL(38, 1)
+  gateway: snowflake
+- name: '"NBA"."RAW"."PLAYERS_ADVANCED"'
   columns:
-    gameid: VARCHAR
-    teamid: VARCHAR
-    teamcity: VARCHAR
-    teamname: VARCHAR
-    teamtricode: VARCHAR
-    teamslug: VARCHAR
-    personid: VARCHAR
-    firstname: VARCHAR
-    familyname: VARCHAR
-    namei: VARCHAR
-    playerslug: VARCHAR
-    position: VARCHAR
-    comment: VARCHAR
-    jerseynum: VARCHAR
-    minutes: VARCHAR
-    effectivefieldgoalpercentage: VARCHAR
-    freethrowattemptrate: VARCHAR
-    teamturnoverpercentage: VARCHAR
-    offensivereboundpercentage: VARCHAR
-    oppeffectivefieldgoalpercentage: VARCHAR
-    oppfreethrowattemptrate: VARCHAR
-    oppteamturnoverpercentage: VARCHAR
-    oppoffensivereboundpercentage: VARCHAR
-  gateway: duckdb
-- name: raw.players_misc
+    GAMEID: VARCHAR(16777216)
+    TEAMID: DECIMAL(38, 0)
+    TEAMCITY: VARCHAR(16777216)
+    TEAMNAME: VARCHAR(16777216)
+    TEAMTRICODE: VARCHAR(16777216)
+    TEAMSLUG: VARCHAR(16777216)
+    PERSONID: DECIMAL(38, 0)
+    FIRSTNAME: VARCHAR(16777216)
+    FAMILYNAME: VARCHAR(16777216)
+    NAMEI: VARCHAR(16777216)
+    PLAYERSLUG: VARCHAR(16777216)
+    POSITION: VARCHAR(16777216)
+    COMMENT: VARCHAR(16777216)
+    JERSEYNUM: VARCHAR(16777216)
+    MINUTES: VARCHAR(16777216)
+    ESTIMATEDOFFENSIVERATING: DECIMAL(38, 1)
+    OFFENSIVERATING: DECIMAL(38, 1)
+    ESTIMATEDDEFENSIVERATING: DECIMAL(38, 1)
+    DEFENSIVERATING: DECIMAL(38, 1)
+    ESTIMATEDNETRATING: DECIMAL(38, 1)
+    NETRATING: DECIMAL(38, 1)
+    ASSISTPERCENTAGE: DECIMAL(38, 3)
+    ASSISTTOTURNOVER: DECIMAL(38, 2)
+    ASSISTRATIO: DECIMAL(38, 1)
+    OFFENSIVEREBOUNDPERCENTAGE: DECIMAL(38, 3)
+    DEFENSIVEREBOUNDPERCENTAGE: DECIMAL(38, 3)
+    REBOUNDPERCENTAGE: DECIMAL(38, 3)
+    TURNOVERRATIO: DECIMAL(38, 1)
+    EFFECTIVEFIELDGOALPERCENTAGE: DECIMAL(38, 3)
+    TRUESHOOTINGPERCENTAGE: DECIMAL(38, 3)
+    USAGEPERCENTAGE: DECIMAL(38, 3)
+    ESTIMATEDUSAGEPERCENTAGE: DECIMAL(38, 3)
+    ESTIMATEDPACE: DECIMAL(38, 2)
+    PACE: DECIMAL(38, 2)
+    PACEPER40: DECIMAL(38, 2)
+    POSSESSIONS: DECIMAL(38, 0)
+    PIE: DECIMAL(38, 3)
+  gateway: snowflake
+- name: '"NBA"."RAW"."PLAYERS_FOURFACTORS"'
   columns:
-    gameid: VARCHAR
-    teamid: VARCHAR
-    teamcity: VARCHAR
-    teamname: VARCHAR
-    teamtricode: VARCHAR
-    teamslug: VARCHAR
-    personid: VARCHAR
-    firstname: VARCHAR
-    familyname: VARCHAR
-    namei: VARCHAR
-    playerslug: VARCHAR
-    position: VARCHAR
-    comment: VARCHAR
-    jerseynum: VARCHAR
-    minutes: VARCHAR
-    pointsoffturnovers: VARCHAR
-    pointssecondchance: VARCHAR
-    pointsfastbreak: VARCHAR
-    pointspaint: VARCHAR
-    opppointsoffturnovers: VARCHAR
-    opppointssecondchance: VARCHAR
-    opppointsfastbreak: VARCHAR
-    opppointspaint: VARCHAR
-    blocks: VARCHAR
-    blocksagainst: VARCHAR
-    foulspersonal: VARCHAR
-    foulsdrawn: VARCHAR
-  gateway: duckdb
-- name: raw.players_scoring
+    GAMEID: VARCHAR(16777216)
+    TEAMID: DECIMAL(38, 0)
+    TEAMCITY: VARCHAR(16777216)
+    TEAMNAME: VARCHAR(16777216)
+    TEAMTRICODE: VARCHAR(16777216)
+    TEAMSLUG: VARCHAR(16777216)
+    PERSONID: DECIMAL(38, 0)
+    FIRSTNAME: VARCHAR(16777216)
+    FAMILYNAME: VARCHAR(16777216)
+    NAMEI: VARCHAR(16777216)
+    PLAYERSLUG: VARCHAR(16777216)
+    POSITION: VARCHAR(16777216)
+    COMMENT: VARCHAR(16777216)
+    JERSEYNUM: VARCHAR(16777216)
+    MINUTES: VARCHAR(16777216)
+    EFFECTIVEFIELDGOALPERCENTAGE: DECIMAL(38, 3)
+    FREETHROWATTEMPTRATE: DECIMAL(38, 3)
+    TEAMTURNOVERPERCENTAGE: DECIMAL(38, 3)
+    OFFENSIVEREBOUNDPERCENTAGE: DECIMAL(38, 3)
+    OPPEFFECTIVEFIELDGOALPERCENTAGE: DECIMAL(38, 3)
+    OPPFREETHROWATTEMPTRATE: DECIMAL(38, 3)
+    OPPTEAMTURNOVERPERCENTAGE: DECIMAL(38, 3)
+    OPPOFFENSIVEREBOUNDPERCENTAGE: DECIMAL(38, 3)
+  gateway: snowflake
+- name: '"NBA"."RAW"."PLAYERS_MISC"'
   columns:
-    gameid: VARCHAR
-    teamid: VARCHAR
-    teamcity: VARCHAR
-    teamname: VARCHAR
-    teamtricode: VARCHAR
-    teamslug: VARCHAR
-    personid: VARCHAR
-    firstname: VARCHAR
-    familyname: VARCHAR
-    namei: VARCHAR
-    playerslug: VARCHAR
-    position: VARCHAR
-    comment: VARCHAR
-    jerseynum: VARCHAR
-    minutes: VARCHAR
-    percentagefieldgoalsattempted2pt: VARCHAR
-    percentagefieldgoalsattempted3pt: VARCHAR
-    percentagepoints2pt: VARCHAR
-    percentagepointsmidrange2pt: VARCHAR
-    percentagepoints3pt: VARCHAR
-    percentagepointsfastbreak: VARCHAR
-    percentagepointsfreethrow: VARCHAR
-    percentagepointsoffturnovers: VARCHAR
-    percentagepointspaint: VARCHAR
-    percentageassisted2pt: VARCHAR
-    percentageunassisted2pt: VARCHAR
-    percentageassisted3pt: VARCHAR
-    percentageunassisted3pt: VARCHAR
-    percentageassistedfgm: VARCHAR
-    percentageunassistedfgm: VARCHAR
-  gateway: duckdb
-- name: raw.players_traditional
+    GAMEID: VARCHAR(16777216)
+    TEAMID: DECIMAL(38, 0)
+    TEAMCITY: VARCHAR(16777216)
+    TEAMNAME: VARCHAR(16777216)
+    TEAMTRICODE: VARCHAR(16777216)
+    TEAMSLUG: VARCHAR(16777216)
+    PERSONID: DECIMAL(38, 0)
+    FIRSTNAME: VARCHAR(16777216)
+    FAMILYNAME: VARCHAR(16777216)
+    NAMEI: VARCHAR(16777216)
+    PLAYERSLUG: VARCHAR(16777216)
+    POSITION: VARCHAR(16777216)
+    COMMENT: VARCHAR(16777216)
+    JERSEYNUM: VARCHAR(16777216)
+    MINUTES: VARCHAR(16777216)
+    POINTSOFFTURNOVERS: DECIMAL(38, 1)
+    POINTSSECONDCHANCE: DECIMAL(38, 1)
+    POINTSFASTBREAK: DECIMAL(38, 1)
+    POINTSPAINT: DECIMAL(38, 1)
+    OPPPOINTSOFFTURNOVERS: DECIMAL(38, 1)
+    OPPPOINTSSECONDCHANCE: DECIMAL(38, 1)
+    OPPPOINTSFASTBREAK: DECIMAL(38, 1)
+    OPPPOINTSPAINT: DECIMAL(38, 1)
+    BLOCKS: DECIMAL(38, 1)
+    BLOCKSAGAINST: DECIMAL(38, 1)
+    FOULSPERSONAL: DECIMAL(38, 1)
+    FOULSDRAWN: DECIMAL(38, 1)
+  gateway: snowflake
+- name: '"NBA"."RAW"."PLAYERS_SCORING"'
   columns:
-    gameid: VARCHAR
-    teamid: VARCHAR
-    teamcity: VARCHAR
-    teamname: VARCHAR
-    teamtricode: VARCHAR
-    teamslug: VARCHAR
-    personid: VARCHAR
-    firstname: VARCHAR
-    familyname: VARCHAR
-    namei: VARCHAR
-    playerslug: VARCHAR
-    position: VARCHAR
-    comment: VARCHAR
-    jerseynum: VARCHAR
-    minutes: VARCHAR
-    fieldgoalsmade: VARCHAR
-    fieldgoalsattempted: VARCHAR
-    fieldgoalspercentage: VARCHAR
-    threepointersmade: VARCHAR
-    threepointersattempted: VARCHAR
-    threepointerspercentage: VARCHAR
-    freethrowsmade: VARCHAR
-    freethrowsattempted: VARCHAR
-    freethrowspercentage: VARCHAR
-    reboundsoffensive: VARCHAR
-    reboundsdefensive: VARCHAR
-    reboundstotal: VARCHAR
-    assists: VARCHAR
-    steals: VARCHAR
-    blocks: VARCHAR
-    turnovers: VARCHAR
-    foulspersonal: VARCHAR
-    points: VARCHAR
-    plusminuspoints: VARCHAR
-  gateway: duckdb
-- name: raw.teams_advanced
+    GAMEID: VARCHAR(16777216)
+    TEAMID: DECIMAL(38, 0)
+    TEAMCITY: VARCHAR(16777216)
+    TEAMNAME: VARCHAR(16777216)
+    TEAMTRICODE: VARCHAR(16777216)
+    TEAMSLUG: VARCHAR(16777216)
+    PERSONID: DECIMAL(38, 0)
+    FIRSTNAME: VARCHAR(16777216)
+    FAMILYNAME: VARCHAR(16777216)
+    NAMEI: VARCHAR(16777216)
+    PLAYERSLUG: VARCHAR(16777216)
+    POSITION: VARCHAR(16777216)
+    COMMENT: VARCHAR(16777216)
+    JERSEYNUM: VARCHAR(16777216)
+    MINUTES: VARCHAR(16777216)
+    PERCENTAGEFIELDGOALSATTEMPTED2PT: DECIMAL(38, 3)
+    PERCENTAGEFIELDGOALSATTEMPTED3PT: DECIMAL(38, 3)
+    PERCENTAGEPOINTS2PT: DECIMAL(38, 3)
+    PERCENTAGEPOINTSMIDRANGE2PT: DECIMAL(38, 3)
+    PERCENTAGEPOINTS3PT: DECIMAL(38, 3)
+    PERCENTAGEPOINTSFASTBREAK: DECIMAL(38, 3)
+    PERCENTAGEPOINTSFREETHROW: DECIMAL(38, 3)
+    PERCENTAGEPOINTSOFFTURNOVERS: DECIMAL(38, 3)
+    PERCENTAGEPOINTSPAINT: DECIMAL(38, 3)
+    PERCENTAGEASSISTED2PT: DECIMAL(38, 3)
+    PERCENTAGEUNASSISTED2PT: DECIMAL(38, 3)
+    PERCENTAGEASSISTED3PT: DECIMAL(38, 3)
+    PERCENTAGEUNASSISTED3PT: DECIMAL(38, 3)
+    PERCENTAGEASSISTEDFGM: DECIMAL(38, 3)
+    PERCENTAGEUNASSISTEDFGM: DECIMAL(38, 3)
+  gateway: snowflake
+- name: '"NBA"."RAW"."PLAYERS_TRADITIONAL"'
   columns:
-    gameid: VARCHAR
-    teamid: VARCHAR
-    teamcity: VARCHAR
-    teamname: VARCHAR
-    teamtricode: VARCHAR
-    teamslug: VARCHAR
-    minutes: VARCHAR
-    estimatedoffensiverating: VARCHAR
-    offensiverating: VARCHAR
-    estimateddefensiverating: VARCHAR
-    defensiverating: VARCHAR
-    estimatednetrating: VARCHAR
-    netrating: VARCHAR
-    assistpercentage: VARCHAR
-    assisttoturnover: VARCHAR
-    assistratio: VARCHAR
-    offensivereboundpercentage: VARCHAR
-    defensivereboundpercentage: VARCHAR
-    reboundpercentage: VARCHAR
-    estimatedteamturnoverpercentage: VARCHAR
-    turnoverratio: VARCHAR
-    effectivefieldgoalpercentage: VARCHAR
-    trueshootingpercentage: VARCHAR
-    usagepercentage: VARCHAR
-    estimatedusagepercentage: VARCHAR
-    estimatedpace: VARCHAR
-    pace: VARCHAR
-    paceper40: VARCHAR
-    possessions: VARCHAR
-    pie: VARCHAR
-  gateway: duckdb
-- name: raw.teams_fourfactors
+    GAMEID: VARCHAR(16777216)
+    TEAMID: DECIMAL(38, 0)
+    TEAMCITY: VARCHAR(16777216)
+    TEAMNAME: VARCHAR(16777216)
+    TEAMTRICODE: VARCHAR(16777216)
+    TEAMSLUG: VARCHAR(16777216)
+    PERSONID: DECIMAL(38, 1)
+    FIRSTNAME: VARCHAR(16777216)
+    FAMILYNAME: VARCHAR(16777216)
+    NAMEI: VARCHAR(16777216)
+    PLAYERSLUG: VARCHAR(16777216)
+    POSITION: VARCHAR(16777216)
+    COMMENT: VARCHAR(16777216)
+    JERSEYNUM: VARCHAR(16777216)
+    MINUTES: VARCHAR(16777216)
+    FIELDGOALSMADE: DECIMAL(38, 1)
+    FIELDGOALSATTEMPTED: DECIMAL(38, 1)
+    FIELDGOALSPERCENTAGE: DECIMAL(38, 16)
+    THREEPOINTERSMADE: DECIMAL(38, 1)
+    THREEPOINTERSATTEMPTED: DECIMAL(38, 1)
+    THREEPOINTERSPERCENTAGE: DECIMAL(38, 16)
+    FREETHROWSMADE: DECIMAL(38, 1)
+    FREETHROWSATTEMPTED: DECIMAL(38, 1)
+    FREETHROWSPERCENTAGE: DECIMAL(38, 16)
+    REBOUNDSOFFENSIVE: DECIMAL(38, 1)
+    REBOUNDSDEFENSIVE: DECIMAL(38, 1)
+    REBOUNDSTOTAL: DECIMAL(38, 1)
+    ASSISTS: DECIMAL(38, 1)
+    STEALS: DECIMAL(38, 1)
+    BLOCKS: DECIMAL(38, 1)
+    TURNOVERS: DECIMAL(38, 1)
+    FOULSPERSONAL: DECIMAL(38, 1)
+    POINTS: DECIMAL(38, 1)
+    PLUSMINUSPOINTS: DECIMAL(38, 1)
+  gateway: snowflake
+- name: '"NBA"."RAW"."TEAMS_ADVANCED"'
   columns:
-    gameid: VARCHAR
-    teamid: VARCHAR
-    teamcity: VARCHAR
-    teamname: VARCHAR
-    teamtricode: VARCHAR
-    teamslug: VARCHAR
-    minutes: VARCHAR
-    effectivefieldgoalpercentage: VARCHAR
-    freethrowattemptrate: VARCHAR
-    teamturnoverpercentage: VARCHAR
-    offensivereboundpercentage: VARCHAR
-    oppeffectivefieldgoalpercentage: VARCHAR
-    oppfreethrowattemptrate: VARCHAR
-    oppteamturnoverpercentage: VARCHAR
-    oppoffensivereboundpercentage: VARCHAR
-  gateway: duckdb
-- name: raw.teams_misc
+    GAMEID: VARCHAR(16777216)
+    TEAMID: DECIMAL(38, 0)
+    TEAMCITY: VARCHAR(16777216)
+    TEAMNAME: VARCHAR(16777216)
+    TEAMTRICODE: VARCHAR(16777216)
+    TEAMSLUG: VARCHAR(16777216)
+    MINUTES: VARCHAR(16777216)
+    ESTIMATEDOFFENSIVERATING: DECIMAL(38, 1)
+    OFFENSIVERATING: DECIMAL(38, 1)
+    ESTIMATEDDEFENSIVERATING: DECIMAL(38, 1)
+    DEFENSIVERATING: DECIMAL(38, 1)
+    ESTIMATEDNETRATING: DECIMAL(38, 1)
+    NETRATING: DECIMAL(38, 1)
+    ASSISTPERCENTAGE: DECIMAL(38, 3)
+    ASSISTTOTURNOVER: DECIMAL(38, 2)
+    ASSISTRATIO: DECIMAL(38, 1)
+    OFFENSIVEREBOUNDPERCENTAGE: DECIMAL(38, 3)
+    DEFENSIVEREBOUNDPERCENTAGE: DECIMAL(38, 3)
+    REBOUNDPERCENTAGE: DECIMAL(38, 3)
+    ESTIMATEDTEAMTURNOVERPERCENTAGE: DECIMAL(38, 3)
+    TURNOVERRATIO: DECIMAL(38, 1)
+    EFFECTIVEFIELDGOALPERCENTAGE: DECIMAL(38, 3)
+    TRUESHOOTINGPERCENTAGE: DECIMAL(38, 3)
+    USAGEPERCENTAGE: DECIMAL(38, 1)
+    ESTIMATEDUSAGEPERCENTAGE: DECIMAL(38, 3)
+    ESTIMATEDPACE: DECIMAL(38, 2)
+    PACE: DECIMAL(38, 2)
+    PACEPER40: DECIMAL(38, 2)
+    POSSESSIONS: DECIMAL(38, 0)
+    PIE: DECIMAL(38, 3)
+  gateway: snowflake
+- name: '"NBA"."RAW"."TEAMS_FOURFACTORS"'
   columns:
-    gameid: VARCHAR
-    teamid: VARCHAR
-    teamcity: VARCHAR
-    teamname: VARCHAR
-    teamtricode: VARCHAR
-    teamslug: VARCHAR
-    minutes: VARCHAR
-    pointsoffturnovers: VARCHAR
-    pointssecondchance: VARCHAR
-    pointsfastbreak: VARCHAR
-    pointspaint: VARCHAR
-    opppointsoffturnovers: VARCHAR
-    opppointssecondchance: VARCHAR
-    opppointsfastbreak: VARCHAR
-    opppointspaint: VARCHAR
-    blocks: VARCHAR
-    blocksagainst: VARCHAR
-    foulspersonal: VARCHAR
-    foulsdrawn: VARCHAR
-  gateway: duckdb
-- name: raw.teams_scoring
+    GAMEID: VARCHAR(16777216)
+    TEAMID: DECIMAL(38, 0)
+    TEAMCITY: VARCHAR(16777216)
+    TEAMNAME: VARCHAR(16777216)
+    TEAMTRICODE: VARCHAR(16777216)
+    TEAMSLUG: VARCHAR(16777216)
+    MINUTES: VARCHAR(16777216)
+    EFFECTIVEFIELDGOALPERCENTAGE: DECIMAL(38, 3)
+    FREETHROWATTEMPTRATE: DECIMAL(38, 3)
+    TEAMTURNOVERPERCENTAGE: DECIMAL(38, 3)
+    OFFENSIVEREBOUNDPERCENTAGE: DECIMAL(38, 3)
+    OPPEFFECTIVEFIELDGOALPERCENTAGE: DECIMAL(38, 3)
+    OPPFREETHROWATTEMPTRATE: DECIMAL(38, 3)
+    OPPTEAMTURNOVERPERCENTAGE: DECIMAL(38, 3)
+    OPPOFFENSIVEREBOUNDPERCENTAGE: DECIMAL(38, 3)
+  gateway: snowflake
+- name: '"NBA"."RAW"."TEAMS_MISC"'
   columns:
-    gameid: VARCHAR
-    teamid: VARCHAR
-    teamcity: VARCHAR
-    teamname: VARCHAR
-    teamtricode: VARCHAR
-    teamslug: VARCHAR
-    minutes: VARCHAR
-    percentagefieldgoalsattempted2pt: VARCHAR
-    percentagefieldgoalsattempted3pt: VARCHAR
-    percentagepoints2pt: VARCHAR
-    percentagepointsmidrange2pt: VARCHAR
-    percentagepoints3pt: VARCHAR
-    percentagepointsfastbreak: VARCHAR
-    percentagepointsfreethrow: VARCHAR
-    percentagepointsoffturnovers: VARCHAR
-    percentagepointspaint: VARCHAR
-    percentageassisted2pt: VARCHAR
-    percentageunassisted2pt: VARCHAR
-    percentageassisted3pt: VARCHAR
-    percentageunassisted3pt: VARCHAR
-    percentageassistedfgm: VARCHAR
-    percentageunassistedfgm: VARCHAR
-  gateway: duckdb
-- name: raw.teams_traditional
+    GAMEID: VARCHAR(16777216)
+    TEAMID: DECIMAL(38, 0)
+    TEAMCITY: VARCHAR(16777216)
+    TEAMNAME: VARCHAR(16777216)
+    TEAMTRICODE: VARCHAR(16777216)
+    TEAMSLUG: VARCHAR(16777216)
+    MINUTES: VARCHAR(16777216)
+    POINTSOFFTURNOVERS: DECIMAL(38, 1)
+    POINTSSECONDCHANCE: DECIMAL(38, 1)
+    POINTSFASTBREAK: DECIMAL(38, 1)
+    POINTSPAINT: DECIMAL(38, 1)
+    OPPPOINTSOFFTURNOVERS: DECIMAL(38, 1)
+    OPPPOINTSSECONDCHANCE: DECIMAL(38, 1)
+    OPPPOINTSFASTBREAK: DECIMAL(38, 1)
+    OPPPOINTSPAINT: DECIMAL(38, 1)
+    BLOCKS: DECIMAL(38, 0)
+    BLOCKSAGAINST: DECIMAL(38, 0)
+    FOULSPERSONAL: DECIMAL(38, 0)
+    FOULSDRAWN: DECIMAL(38, 0)
+  gateway: snowflake
+- name: '"NBA"."RAW"."TEAMS_SCORING"'
   columns:
-    gameid: VARCHAR
-    teamid: VARCHAR
-    teamcity: VARCHAR
-    teamname: VARCHAR
-    teamtricode: VARCHAR
-    teamslug: VARCHAR
-    minutes: VARCHAR
-    fieldgoalsmade: VARCHAR
-    fieldgoalsattempted: VARCHAR
-    fieldgoalspercentage: VARCHAR
-    threepointersmade: VARCHAR
-    threepointersattempted: VARCHAR
-    threepointerspercentage: VARCHAR
-    freethrowsmade: VARCHAR
-    freethrowsattempted: VARCHAR
-    freethrowspercentage: VARCHAR
-    reboundsoffensive: VARCHAR
-    reboundsdefensive: VARCHAR
-    reboundstotal: VARCHAR
-    assists: VARCHAR
-    steals: VARCHAR
-    blocks: VARCHAR
-    turnovers: VARCHAR
-    foulspersonal: VARCHAR
-    points: VARCHAR
-    startersbench: VARCHAR
-  gateway: duckdb
+    GAMEID: VARCHAR(16777216)
+    TEAMID: DECIMAL(38, 0)
+    TEAMCITY: VARCHAR(16777216)
+    TEAMNAME: VARCHAR(16777216)
+    TEAMTRICODE: VARCHAR(16777216)
+    TEAMSLUG: VARCHAR(16777216)
+    MINUTES: VARCHAR(16777216)
+    PERCENTAGEFIELDGOALSATTEMPTED2PT: DECIMAL(38, 3)
+    PERCENTAGEFIELDGOALSATTEMPTED3PT: DECIMAL(38, 3)
+    PERCENTAGEPOINTS2PT: DECIMAL(38, 3)
+    PERCENTAGEPOINTSMIDRANGE2PT: DECIMAL(38, 3)
+    PERCENTAGEPOINTS3PT: DECIMAL(38, 3)
+    PERCENTAGEPOINTSFASTBREAK: DECIMAL(38, 3)
+    PERCENTAGEPOINTSFREETHROW: DECIMAL(38, 3)
+    PERCENTAGEPOINTSOFFTURNOVERS: DECIMAL(38, 3)
+    PERCENTAGEPOINTSPAINT: DECIMAL(38, 3)
+    PERCENTAGEASSISTED2PT: DECIMAL(38, 3)
+    PERCENTAGEUNASSISTED2PT: DECIMAL(38, 3)
+    PERCENTAGEASSISTED3PT: DECIMAL(38, 3)
+    PERCENTAGEUNASSISTED3PT: DECIMAL(38, 3)
+    PERCENTAGEASSISTEDFGM: DECIMAL(38, 3)
+    PERCENTAGEUNASSISTEDFGM: DECIMAL(38, 3)
+  gateway: snowflake
+- name: '"NBA"."RAW"."TEAMS_TRADITIONAL"'
+  columns:
+    GAMEID: VARCHAR(16777216)
+    TEAMID: DECIMAL(38, 0)
+    TEAMCITY: VARCHAR(16777216)
+    TEAMNAME: VARCHAR(16777216)
+    TEAMTRICODE: VARCHAR(16777216)
+    TEAMSLUG: VARCHAR(16777216)
+    MINUTES: VARCHAR(16777216)
+    FIELDGOALSMADE: DECIMAL(38, 1)
+    FIELDGOALSATTEMPTED: DECIMAL(38, 1)
+    FIELDGOALSPERCENTAGE: DECIMAL(38, 16)
+    THREEPOINTERSMADE: DECIMAL(38, 1)
+    THREEPOINTERSATTEMPTED: DECIMAL(38, 1)
+    THREEPOINTERSPERCENTAGE: DECIMAL(38, 16)
+    FREETHROWSMADE: DECIMAL(38, 1)
+    FREETHROWSATTEMPTED: DECIMAL(38, 1)
+    FREETHROWSPERCENTAGE: DECIMAL(38, 16)
+    REBOUNDSOFFENSIVE: DECIMAL(38, 1)
+    REBOUNDSDEFENSIVE: DECIMAL(38, 1)
+    REBOUNDSTOTAL: DECIMAL(38, 1)
+    ASSISTS: DECIMAL(38, 1)
+    STEALS: DECIMAL(38, 1)
+    BLOCKS: DECIMAL(38, 1)
+    TURNOVERS: DECIMAL(38, 1)
+    FOULSPERSONAL: DECIMAL(38, 1)
+    POINTS: DECIMAL(38, 1)
+    STARTERSBENCH: VARCHAR(16777216)
+  gateway: snowflake
